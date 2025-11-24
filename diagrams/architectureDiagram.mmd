@@ -1,0 +1,31 @@
+graph TD
+    subgraph "Presentation Layer (Web)"
+        C[Controllers]
+        DTO[DTOs]
+        M[Mappers]
+    end
+
+    subgraph "Business Layer (Logic)"
+        S[Services]
+        V[Validators]
+    end
+
+    subgraph "Persistence Layer (Data)"
+        R[Repositories]
+        E[Entities]
+    end
+
+    subgraph "Database"
+        DB[(MySQL/PostgreSQL)]
+    end
+
+    User((User/Postman)) -->|JSON Request| C
+    C -->|Map DTO to Entity| M
+    M -->|Entity| S
+    S -->|Call Business Logic| E
+    S -->|Save/Load| R
+    R -->|SQL| DB
+
+%% Key Principle: Dependencies point DOWN
+    classDef layer fill:#0f8666,stroke:#333,stroke-width:2px;
+    class C,S,R layer

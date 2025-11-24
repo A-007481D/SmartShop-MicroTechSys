@@ -1,0 +1,34 @@
+sequenceDiagram
+    actor Admin
+    participant C as OrderController
+    participant S as OrderService
+    participant O as Order Entity
+    participant P as Product Entity
+    participant Cl as Client Entity
+    participant R as Repository
+
+    Admin->>C: POST /orders/{id}/confirm
+    C->>S: confirmOrder(id)
+    S->>R: findOrderById(id)
+    R-->>S: Order Loaded
+
+    S->>O: isFullyPaid()?
+    alt Not Paid
+        O-->>S: false
+        S-->>C: Throw Exception "Payment Incomplete"
+    else Paid
+        O-->>S: true
+
+        loop For Each Item
+            S->>P: decrementStock(quantity)
+        end
+
+        S->>O: setStatus(CONFIRMED)
+
+        S->>Cl: updateStats(orderTotal)
+        Cl->>Cl: recalculateTier()
+
+        S->>R: save(Order)
+        S->>R: save(Client)
+        S-->>C: 200 OK (OrderConfirmed)
+    end
