@@ -4,7 +4,7 @@ import com.microtech.microtechsmartmgmt.enums.UserRole;
 
 public record AuthResponse(
         Long id,
-        String email,
+        String username,
         UserRole role,
         String message
 ) {

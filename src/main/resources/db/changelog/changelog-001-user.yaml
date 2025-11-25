@@ -1,10 +1,7 @@
 databaseChangeLog:
-
-    changeSet:
-
+  - changeSet:
       id: 001-create-users-table
       author: A-007481D
-
       changes:
         - createTable:
             tableName: users
@@ -30,11 +27,17 @@ databaseChangeLog:
                     nullable: false
 
               - column:
-                  name: email
+                  name: username
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
                     unique: true
+
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
 
               - column:
                   name: role
@@ -43,10 +46,10 @@ databaseChangeLog:
                     nullable: false
 
               - column:
-                 name: createdAt
-                 type: TIMESTAMP
-                 constraints:
-                   nullable: false
+                  name: createdAt
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
 
               - column:
                   name: updatedAt

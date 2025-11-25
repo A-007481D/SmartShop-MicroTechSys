@@ -1,4 +1,0 @@
-databaseChangeLog:
-
-  - include:
-      file : classpath:/db.changelog/changelog/changelog-001-user.yaml

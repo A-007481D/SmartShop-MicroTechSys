@@ -20,15 +20,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request, HttpSession session) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BusinessException("Invalid credentials", HttpStatus.UNAUTHORIZED));
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new BusinessException("Invalid username or password", HttpStatus.UNAUTHORIZED));
 
         if (!user.getPassword().equals(request.password())) {
-            throw new BusinessException("invalid credentials", HttpStatus.UNAUTHORIZED);
+            throw new BusinessException("Invalid username or password", HttpStatus.UNAUTHORIZED);
         }
 
         SessionUtils.setUser(session, user);
-        return new AuthResponse(user.getId(), user.getEmail(), user.getRole(), "loging successful");
+        return new AuthResponse(user.getId(), user.getUsername(), user.getRole(), "Login successful");
     }
 
     @Override
