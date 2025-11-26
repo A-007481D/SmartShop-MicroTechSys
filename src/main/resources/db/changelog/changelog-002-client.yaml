@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-clients-table
+      author: A-007481D
+      changes:
+        - createTable:
+            tableName: clients
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: tier
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: total_orders
+                  type: INT
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: total_spent
+                  type: DECIMAL(19,2)
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: clients
+            baseColumnNames: user_id
+            constraintName: fk_client_user
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+

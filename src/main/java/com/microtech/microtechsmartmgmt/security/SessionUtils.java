@@ -1,9 +1,8 @@
 package com.microtech.microtechsmartmgmt.security;
 
 import com.microtech.microtechsmartmgmt.entity.User;
+import com.microtech.microtechsmartmgmt.enums.UserRole;
 import jakarta.servlet.http.HttpSession;
-
-import static com.microtech.microtechsmartmgmt.security.SessionUtils.getUser;
 
 public class SessionUtils {
     public static final String SESSION_USER_KEY = "CURRENT_USER";
@@ -20,8 +19,13 @@ public class SessionUtils {
         return getUser(session) != null;
     }
 
-    public Long getCurrentUserId(HttpSession session) {
+    public static Long getUserId(HttpSession session) {
         User user = getUser(session);
-        return  user != null ? user.getId() : null;
+        return user != null ? user.getId() : null;
+    }
+
+    public static UserRole getUserRole(HttpSession session) {
+        User user = getUser(session);
+        return user != null ? user.getRole() : null;
     }
 }

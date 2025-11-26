@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-orders-table
+      author: A-007481D
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: client_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_order_client
+                    references: clients(user_id)
+
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: promo_code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: sub_total
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: discount_amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: tax_amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: total_ttc
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,5 +52,9 @@ public class Order extends BaseEntity {
     public void addPayment(Payment payment) {
         payment.setOrder(this);
         this.payments.add(payment);
+    }
+
+    public void setOrderDate(LocalDateTime now) {
+        this.setOrderDate(now);
     }
 }

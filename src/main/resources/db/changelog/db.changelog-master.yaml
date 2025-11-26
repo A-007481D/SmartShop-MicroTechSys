@@ -1,3 +1,13 @@
 databaseChangeLog:
   - include:
       file: classpath:db/changelog/changelog-001-user.yaml
+  - include:
+      file: classpath:db/changelog/changelog-002-client.yaml
+  - include:
+      file: classpath:db/changelog/changelog-003-product.yaml
+  - include:
+      file: classpath:db/changelog/changelog-004-order.yaml
+  - include:
+      file: classpath:db/changelog/changelog-005-order-item.yaml
+  - include:
+      file: classpath:db/changelog/changelog-006-payment.yaml
