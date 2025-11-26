@@ -19,4 +19,9 @@ public class SessionUtils {
     public static boolean isLoggedIn(HttpSession session) {
         return getUser(session) != null;
     }
+
+    public Long getCurrentUserId(HttpSession session) {
+        User user = getUser(session);
+        return  user != null ? user.getId() : null;
+    }
 }
