@@ -20,14 +20,14 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    private Integer paymentNumber; // sequential per order
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
-
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     private BigDecimal amount;
     private String reference;
-    private LocalDate paymentDate;
-    private LocalDate clearingDate;
-
+    private String bankName;
+    private LocalDate paymentDate; // payment date
+    private LocalDate clearingDate; // payment cleared
 }

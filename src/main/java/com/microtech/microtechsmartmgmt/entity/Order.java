@@ -1,6 +1,7 @@
 package com.microtech.microtechsmartmgmt.entity;
 
 import com.microtech.microtechsmartmgmt.enums.OrderStatus;
+import com.microtech.microtechsmartmgmt.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,20 +42,24 @@ public class Order extends BaseEntity {
     private BigDecimal taxAmount;
     private BigDecimal totalTTC;
 
+
     public BigDecimal getRemainingBalance() {
+        if (totalTTC == null) {
+            return BigDecimal.ZERO;
+        }
         BigDecimal paid = payments.stream()
-                .filter(p -> p.getStatus().name().equals("CONFIRMED"))
+                .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return totalTTC.subtract(paid);
     }
 
+    public boolean isFullyPaid() {
+        return getRemainingBalance().compareTo(BigDecimal.ZERO) <= 0;
+    }
+
     public void addPayment(Payment payment) {
         payment.setOrder(this);
         this.payments.add(payment);
-    }
-
-    public void setOrderDate(LocalDateTime now) {
-        this.setOrderDate(now);
     }
 }
