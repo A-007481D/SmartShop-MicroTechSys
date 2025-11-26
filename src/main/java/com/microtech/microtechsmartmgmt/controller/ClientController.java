@@ -5,6 +5,7 @@ import com.microtech.microtechsmartmgmt.entity.Order;
 import com.microtech.microtechsmartmgmt.enums.UserRole;
 import com.microtech.microtechsmartmgmt.security.RequireRole;
 import com.microtech.microtechsmartmgmt.service.ClientService;
+import com.microtech.microtechsmartmgmt.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ClientController {
 
     private final ClientService clientService;
+    private final OrderService orderService;
 
     @GetMapping("/profile")
     @RequireRole(UserRole.CLIENT)
@@ -26,7 +28,6 @@ public class ClientController {
         Client profile = clientService.getClientProfile(userId);
         return ResponseEntity.ok(profile);
     }
-
 
     @GetMapping("/orders")
     @RequireRole(UserRole.CLIENT)
@@ -47,5 +48,14 @@ public class ClientController {
         return ResponseEntity.ok(order);
     }
 
-
+    @PutMapping("/orders/{orderId}/cancel")
+    @RequireRole(UserRole.CLIENT)
+    public ResponseEntity<Order> cancelMyOrder(
+            HttpServletRequest request,
+            @PathVariable Long orderId
+    ) {
+        Long userId = (Long) request.getAttribute("userId");
+        Order cancelledOrder = orderService.cancelOrder(orderId, userId);
+        return ResponseEntity.ok(cancelledOrder);
+    }
 }

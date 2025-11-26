@@ -1,0 +1,96 @@
+name: Maven CI
+
+on:
+  push:
+    branches: [ "main", "feature/**" ]
+  pull_request:
+    branches: [ "main", "feature/**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: microtech
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..20}; do
+            nc -z localhost 5432 && echo "Postgres is up" && break
+            echo "Waiting for Postgres..." && sleep 3
+          done
+
+      - name: Verify Liquibase changelogs (syntax only)
+        run: |
+          ./mvnw -v || mvn -v
+          # Run an updateSQL to validate changelog syntax without applying changes
+          mvn --batch-mode liquibase:updateSQL
+
+      - name: Build and run unit tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/microtech
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+        run: |
+          mvn --batch-mode -DskipITs=true clean verify
+
+      - name: Package application
+        run: mvn --batch-mode -DskipTests package
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: smartshop-artifacts
+          path: |
+            target/*.jar
+            target/classes/**
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Lint YAML and Markdown
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq yamllint
+          yamllint -s .github/workflows/*.yml || true
+          # Basic check that Liquibase files are valid YAML
+          for f in src/main/resources/db/changelog/*.yaml; do
+            yamllint -s "$f" || true
+          done
+
+      - name: Maven dependency vulnerability scan (OSS Index)
+        run: |
+          mvn --batch-mode org.owasp:dependency-check-maven:check || true
+
