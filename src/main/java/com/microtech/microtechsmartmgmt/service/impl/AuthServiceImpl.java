@@ -1,6 +1,7 @@
 package com.microtech.microtechsmartmgmt.service.impl;
 
 import com.microtech.microtechsmartmgmt.dto.request.LoginRequest;
+import com.microtech.microtechsmartmgmt.dto.request.CreateClientRequest;
 import com.microtech.microtechsmartmgmt.dto.response.AuthResponse;
 import com.microtech.microtechsmartmgmt.entity.User;
 import com.microtech.microtechsmartmgmt.exception.BusinessException;
@@ -34,5 +35,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(HttpSession session) {
         session.invalidate();
+    }
+
+    @Override
+    public AuthResponse register(CreateClientRequest request) {
+        if (userRepository.findByUsername(request.username()).isPresent()) {
+            throw new BusinessException("User name already exists", HttpStatus.BAD_REQUEST);
+
+        }
+
+        User newClient = new  User();
+        newClient.setUsername(request.username());
+        newClient.setPassword(request.password());
+        newClient.setRole(request.role());
+
+        User savedUser = userRepository.save(newClient);
+
+        return new AuthResponse(savedUser.getId(), savedUser.getUsername(), savedUser.getRole(),
+                "Client registered successfully");
     }
 }

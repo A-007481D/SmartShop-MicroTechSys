@@ -34,6 +34,9 @@ public class AuthInterceptor implements HandlerInterceptor{
         }
 
         User currentUser = SessionUtils.getUser(session);
+        request.setAttribute("userId", currentUser.getId());
+        request.setAttribute("userRole", currentUser.getRole());
+
         boolean hasAllowedRole = Arrays.stream(requireRole.value())
                 .anyMatch(role -> role == currentUser.getRole());
 
