@@ -28,4 +28,31 @@ public class SessionUtils {
         User user = getUser(session);
         return user != null ? user.getRole() : null;
     }
+
+    public static void requireAdmin(HttpSession session) {
+        if (!isLoggedIn(session)) {
+            throw new RuntimeException("Unauthorized: Please login first");
+        }
+        if (getUserRole(session) != UserRole.ADMIN) {
+            throw new RuntimeException("Forbidden: Admin access required");
+        }
+    }
+
+    public static void requireAuthenticated(HttpSession session) {
+        if (!isLoggedIn(session)) {
+            throw new RuntimeException("Unauthorized: Please login first");
+        }
+    }
+
+    public static void requireClientOwnership(HttpSession session, Long clientId) {
+        requireAuthenticated(session);
+        UserRole role = getUserRole(session);
+        if (role == UserRole.ADMIN) {
+            return;
+        }
+        Long userId = getUserId(session);
+        if (!userId.equals(clientId)) {
+            throw new RuntimeException("Forbidden: You can only access your own data");
+        }
+    }
 }

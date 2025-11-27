@@ -11,12 +11,10 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderMapper {
 
-
     @Mapping(target = "clientId", source = "client.id")
     @Mapping(target = "clientName", source = "client.fullName")
     @Mapping(target = "remainingBalance", expression = "java(order.getRemainingBalance())")
     OrderResponse toResponse(Order order);
-
 
     @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "productName", source = "product.name")
