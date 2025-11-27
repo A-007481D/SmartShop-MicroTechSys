@@ -51,14 +51,10 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("Username already exists", HttpStatus.BAD_REQUEST);
         }
 
-        if (request.role() != UserRole.CLIENT) {
-            throw new BusinessException("Only CLIENT role can be registered through this endpoint", HttpStatus.BAD_REQUEST);
-        }
-
         Client newClient = Client.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
-                .name(request.fullName())
+                .fullName(request.fullName())
                 .role(UserRole.CLIENT)
                 .fullName(request.fullName())
                 .tier(CustomerTier.BASIC)

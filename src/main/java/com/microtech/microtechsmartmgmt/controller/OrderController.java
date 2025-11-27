@@ -40,8 +40,8 @@ public class OrderController {
 
     @PostMapping
     @RequireRole(UserRole.ADMIN)
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) {
-        Order createdOrder = orderService.createOrder(order);
+    public ResponseEntity<Order> createOrder(@Valid @RequestBody com.microtech.microtechsmartmgmt.dto.request.CreateOrderRequest request) {
+        Order createdOrder = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 

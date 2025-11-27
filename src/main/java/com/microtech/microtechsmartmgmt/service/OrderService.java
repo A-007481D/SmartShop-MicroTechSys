@@ -1,5 +1,6 @@
 package com.microtech.microtechsmartmgmt.service;
 
+import com.microtech.microtechsmartmgmt.dto.request.CreateOrderRequest;
 import com.microtech.microtechsmartmgmt.entity.Order;
 import com.microtech.microtechsmartmgmt.enums.OrderStatus;
 
@@ -8,6 +9,7 @@ import java.util.Optional;
 
 public interface OrderService {
 
+    Order createOrder(CreateOrderRequest request);
     Order createOrder(Order order);
     // admin only
     List<Order> getAllOrdersForAdmin();
