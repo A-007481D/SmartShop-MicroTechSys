@@ -43,7 +43,11 @@ jobs:
             echo "Waiting for Postgres..." && sleep 3
           done
 
-      - name: Verify Liquibase changelogs (syntax only)
+      - name: Verify Liquibase changelogs syntax
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/microtech
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
         run: |
           ./mvnw -v || mvn -v
           # Run an updateSQL to validate changelog syntax without applying changes
