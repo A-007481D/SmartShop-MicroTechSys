@@ -16,7 +16,7 @@ import java.util.List;
 // admin order ops controller
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -29,7 +29,6 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-
     @GetMapping("/{orderId}")
     @RequireRole(UserRole.ADMIN)
     public ResponseEntity<Order> getOrder(@PathVariable Long orderId) {
@@ -39,19 +38,18 @@ public class OrderController {
     }
 
     @PostMapping
-    @RequireRole(UserRole.ADMIN)
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody com.microtech.microtechsmartmgmt.dto.request.CreateOrderRequest request) {
+    @RequireRole(UserRole.CLIENT)
+    public ResponseEntity<Order> createOrder(
+            @Valid @RequestBody com.microtech.microtechsmartmgmt.dto.request.CreateOrderRequest request) {
         Order createdOrder = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
-
 
     @PutMapping("/{orderId}/status")
     @RequireRole(UserRole.ADMIN)
     public ResponseEntity<Order> updateOrderStatus(
             @PathVariable Long orderId,
-            @RequestParam OrderStatus status
-    ) {
+            @RequestParam OrderStatus status) {
         Order updatedOrder = orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.ok(updatedOrder);
     }
@@ -60,13 +58,11 @@ public class OrderController {
     @RequireRole(UserRole.ADMIN)
     public ResponseEntity<Order> updateOrder(
             @PathVariable Long orderId,
-            @Valid @RequestBody Order order
-    ) {
+            @Valid @RequestBody Order order) {
         order.setId(orderId);
         Order updatedOrder = orderService.updateOrder(order);
         return ResponseEntity.ok(updatedOrder);
     }
-
 
     @DeleteMapping("/{orderId}")
     @RequireRole(UserRole.ADMIN)
@@ -82,4 +78,3 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 }
-

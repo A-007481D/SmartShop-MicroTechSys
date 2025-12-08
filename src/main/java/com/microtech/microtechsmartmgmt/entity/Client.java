@@ -18,10 +18,14 @@ import java.util.List;
 @Table(name = "clients")
 @Entity
 @PrimaryKeyJoinColumn(name = "user_id")
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Client extends User {
 
     private String fullName;
     private String email;
+
+    private LocalDateTime firstOrderDate;
+    private LocalDateTime lastOrderDate;
 
     @Enumerated(EnumType.STRING)
     private CustomerTier tier;
@@ -32,6 +36,7 @@ public class Client extends User {
     @Builder.Default
     private BigDecimal totalSpent = BigDecimal.ZERO;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private List<Order> orders;
 
@@ -53,6 +58,5 @@ public class Client extends User {
             this.tier = CustomerTier.BASIC;
         }
     }
-
 
 }

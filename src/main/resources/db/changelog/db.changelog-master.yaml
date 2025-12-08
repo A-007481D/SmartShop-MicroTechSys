@@ -1,13 +1,24 @@
 databaseChangeLog:
   - include:
-      file: classpath:db/changelog/changelog-001-user.yaml
+      file: changelog-001-user.yaml
+      relativeToChangelogFile: true
   - include:
-      file: classpath:db/changelog/changelog-002-client.yaml
+      file: changelog-002-client.yaml
+      relativeToChangelogFile: true
   - include:
-      file: classpath:db/changelog/changelog-003-product.yaml
+      file: changelog-003-product.yaml
+      relativeToChangelogFile: true
   - include:
-      file: classpath:db/changelog/changelog-004-order.yaml
+      file: changelog-004-order.yaml
+      relativeToChangelogFile: true
   - include:
-      file: classpath:db/changelog/changelog-005-order-item.yaml
+      file: changelog-005-order-item.yaml
+      relativeToChangelogFile: true
   - include:
-      file: classpath:db/changelog/changelog-006-payment.yaml
+      file: changelog-006-payment.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db/changelog/changelog-007-client-dates.yaml
+  - include:
+      file: changelog-008-product-active.yaml
+      relativeToChangelogFile: true

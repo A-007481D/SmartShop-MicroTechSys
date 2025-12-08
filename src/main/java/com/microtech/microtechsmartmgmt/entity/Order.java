@@ -17,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Order extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,11 +38,17 @@ public class Order extends BaseEntity {
 
     private String promoCode;
 
+    @Column(name = "sub_total")
     private BigDecimal subTotal;
-    private BigDecimal discountAmount;
-    private BigDecimal taxAmount;
-    private BigDecimal totalTTC;
 
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
+
+    @Column(name = "tax_amount")
+    private BigDecimal taxAmount;
+
+    @Column(name = "total_ttc")
+    private BigDecimal totalTTC;
 
     public BigDecimal getRemainingBalance() {
         if (totalTTC == null) {

@@ -1,48 +1,56 @@
 databaseChangeLog:
   - changeSet:
-      id: 002-create-clients-table
+      id: 003-create-products-table
       author: A-007481D
       changes:
         - createTable:
-            tableName: clients
+            tableName: products
             columns:
-                - column:
-                    name: user_id
-                    type: BIGINT
-                    constraints:
-                        primaryKey: true
-                        nullable: false
-                        foreignKeyName: fk_client_user
-                        references: users(id)
-
-                - column:
-                    name: full_name
-                    type: VARCHAR(255)
-                    constraints:
-                        nullable: true
-
-                - column:
-                    name: email
-                    type: VARCHAR(255)
-                    constraints:
-                        nullable: true
-
-                - column:
-                    name: tier
-                    type: VARCHAR(50)
-                    constraints:
-                        nullable: true
-
-                - column:
-                    name: total_orders
-                    type: INT
-                    defaultValue: 0
-                    constraints:
-                        nullable: false
-
-                - column:
-                    name: total_spent
-                    type: DECIMAL(19,2)
-                    defaultValue: 0
-                    constraints:
-                        nullable: false
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(1000)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: price
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stock_quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true

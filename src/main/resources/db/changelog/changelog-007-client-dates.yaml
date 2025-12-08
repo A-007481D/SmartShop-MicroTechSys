@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-add-client-dates
+      author: A-007481D
+      changes:
+        - addColumn:
+            tableName: clients
+            columns:
+              - column:
+                  name: first_order_date
+                  type: datetime
+              - column:
+                  name: last_order_date
+                  type: datetime

@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "products")
-public class Product extends  BaseEntity {
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+public class Product extends BaseEntity {
     private String name;
     private String description;
     private BigDecimal price;
@@ -24,7 +26,7 @@ public class Product extends  BaseEntity {
     @Builder.Default
     private boolean deleted = false;
 
-    public void  decrementStock(int quantity) {
+    public void decrementStock(int quantity) {
         if (this.stockQuantity < quantity) {
             throw new RuntimeException("Insufficient stock for product" + this.name);
         }
