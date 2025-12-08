@@ -38,7 +38,7 @@ public class OrderController {
     }
 
     @PostMapping
-    @RequireRole(UserRole.CLIENT)
+    @RequireRole(UserRole.ADMIN)
     public ResponseEntity<Order> createOrder(
             @Valid @RequestBody com.microtech.microtechsmartmgmt.dto.request.CreateOrderRequest request) {
         Order createdOrder = orderService.createOrder(request);
