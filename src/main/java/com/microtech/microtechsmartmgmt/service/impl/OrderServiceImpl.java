@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,8 @@ public class OrderServiceImpl implements OrderService {
 
         for (var itemRequest : request.items()) {
             Product product = productRepository.findById(itemRequest.productId())
-                    .orElseThrow(() -> new BusinessException("Product not found: " + itemRequest.productId(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new BusinessException("Product not found: " + itemRequest.productId(),
+                            HttpStatus.NOT_FOUND));
 
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
@@ -72,11 +74,11 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("Order must contain at least one item", HttpStatus.BAD_REQUEST);
         }
 
-        // Set product info and prices for each item (stock validation happens at confirmation, not creation)
+        // stock validation happens at confirmation, not creation
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findById(item.getProduct().getId())
-                    .orElseThrow(() -> new BusinessException("Product not found: " + item.getProduct().getId(), HttpStatus.NOT_FOUND));
-
+                    .orElseThrow(() -> new BusinessException("Product not found: " + item.getProduct().getId(),
+                            HttpStatus.NOT_FOUND));
 
             item.setProduct(product);
             item.setUnitPrice(product.getPrice());
@@ -101,7 +103,8 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal amountHTAfterDiscount = subtotalHT.subtract(totalDiscount);
         amountHTAfterDiscount = MoneyUtil.round(amountHTAfterDiscount);
 
-        BigDecimal vat = MoneyUtil.calculatePercentage(amountHTAfterDiscount, vatRate.multiply(new BigDecimal("100")).doubleValue());
+        BigDecimal vat = MoneyUtil.calculatePercentage(amountHTAfterDiscount,
+                vatRate.multiply(new BigDecimal("100")).doubleValue());
 
         BigDecimal totalTTC = amountHTAfterDiscount.add(vat);
         totalTTC = MoneyUtil.round(totalTTC);
@@ -195,12 +198,11 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (order.getStatus() == OrderStatus.CONFIRMED ||
-            order.getStatus() == OrderStatus.REJECTED ||
-            order.getStatus() == OrderStatus.CANCELED) {
+                order.getStatus() == OrderStatus.REJECTED ||
+                order.getStatus() == OrderStatus.CANCELED) {
             throw new BusinessException(
-                "Cannot modify order with final status: " + order.getStatus(),
-                HttpStatus.valueOf(422)
-            );
+                    "Cannot modify order with final status: " + order.getStatus(),
+                    HttpStatus.valueOf(422));
         }
 
         order.setStatus(newStatus);
@@ -213,24 +215,20 @@ public class OrderServiceImpl implements OrderService {
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new BusinessException(
-                "Only PENDING orders can be confirmed. Current status: " + order.getStatus(),
-                HttpStatus.valueOf(422)
-            );
+                    "Only PENDING orders can be confirmed. Current status: " + order.getStatus(),
+                    HttpStatus.valueOf(422));
         }
 
         if (!order.isFullyPaid()) {
             throw new BusinessException(
-                "Order cannot be confirmed until fully paid. Remaining: " + order.getRemainingBalance(),
-                HttpStatus.valueOf(422)
-            );
+                    "Order cannot be confirmed until fully paid. Remaining: " + order.getRemainingBalance(),
+                    HttpStatus.valueOf(422));
         }
 
-        // Validate stock availability at confirmation time (not at creation)
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findById(item.getProduct().getId())
                     .orElseThrow(() -> new BusinessException("Product not found", HttpStatus.NOT_FOUND));
 
-            // If stock insufficient, REJECT the order instead of confirming
             if (product.getStockQuantity() < item.getQuantity()) {
                 order.setStatus(OrderStatus.REJECTED);
                 return orderRepository.save(order);
@@ -247,6 +245,12 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Client client = order.getClient();
+
+        if (client.getFirstOrderDate() == null) {
+            client.setFirstOrderDate(LocalDateTime.now());
+        }
+        client.setLastOrderDate(LocalDateTime.now());
+
         client.updateStats(order.getTotalTTC());
         clientRepository.save(client);
 
@@ -259,14 +263,12 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderForClient(orderId, clientId)
                 .orElseThrow(() -> new BusinessException(
                         "Order not found or you don't have permission to cancel this order",
-                        HttpStatus.FORBIDDEN
-                ));
+                        HttpStatus.FORBIDDEN));
 
         if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.CANCELED) {
             throw new BusinessException(
                     "Cannot cancel order with status: " + order.getStatus(),
-                    HttpStatus.BAD_REQUEST
-            );
+                    HttpStatus.BAD_REQUEST);
         }
 
         order.setStatus(OrderStatus.CANCELED);
