@@ -15,6 +15,7 @@ import com.microtech.microtechsmartmgmt.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
-    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AuthResponse login(LoginRequest request, HttpSession session) {

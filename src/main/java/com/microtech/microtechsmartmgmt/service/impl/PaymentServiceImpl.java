@@ -52,6 +52,26 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
+        // cheque
+        if (request.paymentType() == PaymentType.CHECK) {
+            if (request.reference() == null || request.reference().isBlank()) {
+                throw new BusinessRuleViolationException("Check payment requires reference number (numéro)");
+            }
+            if (request.bankName() == null || request.bankName().isBlank()) {
+                throw new BusinessRuleViolationException("Check payment requires bank name");
+            }
+        }
+
+        // virement
+        if (request.paymentType() == PaymentType.BANK) {
+            if (request.reference() == null || request.reference().isBlank()) {
+                throw new BusinessRuleViolationException("Bank transfer requires reference");
+            }
+            if (request.bankName() == null || request.bankName().isBlank()) {
+                throw new BusinessRuleViolationException("Bank transfer requires bank name");
+            }
+        }
+
         // calc next payment sequentially
         int nextPaymentNumber = order.getPayments().size() + 1;
 

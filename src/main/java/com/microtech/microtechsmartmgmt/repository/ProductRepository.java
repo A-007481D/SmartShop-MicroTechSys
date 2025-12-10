@@ -12,12 +12,8 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByDeletedFalse();
+
     List<Product> findByDeletedFalseAndActiveTrue();
 
     Page<Product> findByDeletedFalse(Pageable pageable);
-
-    @Query("SELECT CASE WHEN COUNT(oi) > 0 THEN true ELSE false END " +
-           "FROM OrderItem oi WHERE oi.product.id = :productId")
-    boolean isProductUsedInOrders(Long productId);
 }
-

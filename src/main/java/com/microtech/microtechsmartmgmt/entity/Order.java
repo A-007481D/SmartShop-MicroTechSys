@@ -1,9 +1,11 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.microtech.microtechsmartmgmt.enums.OrderStatus;
 import com.microtech.microtechsmartmgmt.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,8 +18,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@SuperBuilder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Order extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

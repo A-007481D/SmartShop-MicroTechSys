@@ -1,5 +1,6 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     private Order order;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

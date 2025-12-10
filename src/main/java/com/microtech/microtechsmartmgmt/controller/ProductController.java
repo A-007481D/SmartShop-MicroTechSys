@@ -2,6 +2,7 @@ package com.microtech.microtechsmartmgmt.controller;
 
 import com.microtech.microtechsmartmgmt.entity.Product;
 import com.microtech.microtechsmartmgmt.enums.UserRole;
+import com.microtech.microtechsmartmgmt.exception.ResourceNotFoundException;
 import com.microtech.microtechsmartmgmt.security.RequireRole;
 import com.microtech.microtechsmartmgmt.service.ProductService;
 import jakarta.validation.Valid;
@@ -56,11 +57,11 @@ public class ProductController {
     @GetMapping("/admin/products/{id}")
     @RequireRole(UserRole.ADMIN)
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found with id: " + id));
+        return ResponseEntity.ok(product);
     }
-
 
     @GetMapping("/products")
     @RequireRole(UserRole.CLIENT)
@@ -75,10 +76,10 @@ public class ProductController {
     @GetMapping("/products/{id}")
     @RequireRole(UserRole.CLIENT)
     public ResponseEntity<Product> getProductByIdForClient(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .filter(product -> !product.isDeleted() && product.isActive())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Product product = productService.getProductById(id)
+                .filter(p -> !p.isDeleted() && p.isActive())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found with id: " + id));
+        return ResponseEntity.ok(product);
     }
 }
-

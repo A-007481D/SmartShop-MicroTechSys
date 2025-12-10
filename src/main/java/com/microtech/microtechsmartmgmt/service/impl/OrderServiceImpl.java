@@ -8,6 +8,7 @@ import com.microtech.microtechsmartmgmt.entity.Product;
 import com.microtech.microtechsmartmgmt.enums.CustomerTier;
 import com.microtech.microtechsmartmgmt.enums.OrderStatus;
 import com.microtech.microtechsmartmgmt.exception.BusinessException;
+import com.microtech.microtechsmartmgmt.exception.BusinessRuleViolationException;
 import com.microtech.microtechsmartmgmt.repository.ClientRepository;
 import com.microtech.microtechsmartmgmt.repository.OrderRepository;
 import com.microtech.microtechsmartmgmt.repository.ProductRepository;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +46,16 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .client(client)
                 .promoCode(request.promoCode())
-                .items(new java.util.ArrayList<>())
+                .items(new ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
+
+        if (request.promoCode() != null && !request.promoCode().isBlank()) {
+            if (orderRepository.existsByClientIdAndPromoCode(request.clientId(), request.promoCode())) {
+                throw new BusinessRuleViolationException(
+                        "Promo code '" + request.promoCode() + "' has already been used by this client");
+            }
+        }
 
         for (var itemRequest : request.items()) {
             Product product = productRepository.findById(itemRequest.productId())

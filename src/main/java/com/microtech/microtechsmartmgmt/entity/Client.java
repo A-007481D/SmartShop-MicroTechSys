@@ -1,5 +1,7 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.microtech.microtechsmartmgmt.enums.CustomerTier;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +20,7 @@ import java.util.List;
 @Table(name = "clients")
 @Entity
 @PrimaryKeyJoinColumn(name = "user_id")
-@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Client extends User {
 
     private String fullName;
@@ -36,7 +38,7 @@ public class Client extends User {
     @Builder.Default
     private BigDecimal totalSpent = BigDecimal.ZERO;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private List<Order> orders;
 

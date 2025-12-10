@@ -3,6 +3,7 @@ package com.microtech.microtechsmartmgmt.service.impl;
 import com.microtech.microtechsmartmgmt.entity.Product;
 import com.microtech.microtechsmartmgmt.exception.BusinessRuleViolationException;
 import com.microtech.microtechsmartmgmt.exception.ResourceNotFoundException;
+import com.microtech.microtechsmartmgmt.repository.OrderItemRepository;
 import com.microtech.microtechsmartmgmt.repository.ProductRepository;
 import com.microtech.microtechsmartmgmt.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Override
     public Product createProduct(Product product) {
@@ -78,7 +80,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public boolean isProductUsedInOrders(Long productId) {
-        return productRepository.isProductUsedInOrders(productId);
+        return orderItemRepository.existsByProductId(productId);
     }
 }
-
