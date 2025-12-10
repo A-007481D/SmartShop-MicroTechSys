@@ -10,8 +10,13 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByClient(Client client);
+
     List<Order> findByClientId(Long clientId);
+
+    boolean existsByClientIdAndPromoCode(Long clientId, String promoCode);
+
     List<Order> findByStatus(OrderStatus status);
+
     List<Order> findByClientIdAndStatus(Long clientId, OrderStatus status);
     // deleted by id is inherited from jparepo
 }

@@ -32,3 +32,11 @@ build/
 ### VS Code ###
 .vscode/
 compile.log
+
+### Local Helpers ###
+test-*.sh
+scripts/demo-data.sql
+cookies*.txt
+app.log
+liquibase.log
+src/main/java/com/microtech/microtechsmartmgmt/config/DataInitializer.java

@@ -1,13 +1,10 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.microtech.microtechsmartmgmt.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.repository.cdi.Eager;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +14,8 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User extends  BaseEntity {
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String name;

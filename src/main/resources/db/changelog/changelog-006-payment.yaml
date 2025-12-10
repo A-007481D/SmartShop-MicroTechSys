@@ -47,6 +47,18 @@ databaseChangeLog:
                     nullable: true
 
               - column:
+                  name: payment_number
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: bank_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+              - column:
                   name: payment_date
                   type: DATE
                   constraints:

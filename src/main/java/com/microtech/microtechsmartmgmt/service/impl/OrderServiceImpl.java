@@ -8,10 +8,12 @@ import com.microtech.microtechsmartmgmt.entity.Product;
 import com.microtech.microtechsmartmgmt.enums.CustomerTier;
 import com.microtech.microtechsmartmgmt.enums.OrderStatus;
 import com.microtech.microtechsmartmgmt.exception.BusinessException;
+import com.microtech.microtechsmartmgmt.exception.BusinessRuleViolationException;
 import com.microtech.microtechsmartmgmt.repository.ClientRepository;
 import com.microtech.microtechsmartmgmt.repository.OrderRepository;
 import com.microtech.microtechsmartmgmt.repository.ProductRepository;
 import com.microtech.microtechsmartmgmt.service.OrderService;
+import com.microtech.microtechsmartmgmt.service.PaymentService;
 import com.microtech.microtechsmartmgmt.util.MoneyUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +35,56 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
+    private final PaymentService paymentService;
 
     @Value("${app.vat.rate:0.20}")
     private BigDecimal vatRate;
+
+
+    @Override
+    public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException("Order not found", HttpStatus.NOT_FOUND));
+
+        if (newStatus == OrderStatus.CONFIRMED && order.getStatus() != OrderStatus.CONFIRMED) {
+            return confirmOrder(orderId);
+        }
+
+        if (order.getStatus() == OrderStatus.CONFIRMED ||
+                order.getStatus() == OrderStatus.REJECTED ||
+                order.getStatus() == OrderStatus.CANCELED) {
+            throw new BusinessException(
+                    "Cannot modify order with final status: " + order.getStatus(),
+                    HttpStatus.valueOf(422));
+        }
+
+        order.setStatus(newStatus);
+
+        if (newStatus == OrderStatus.REJECTED || newStatus == OrderStatus.CANCELED) {
+            paymentService.refundPayments(orderId);
+        }
+
+        return orderRepository.save(order);
+    }
+
+
+    @Override
+    public Order cancelOrder(Long orderId, Long clientId) {
+        Order order = getOrderForClient(orderId, clientId)
+                .orElseThrow(() -> new BusinessException(
+                        "Order not found or you don't have permission to cancel this order",
+                        HttpStatus.FORBIDDEN));
+
+        if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.CANCELED) {
+            throw new BusinessException(
+                    "Cannot cancel order with status: " + order.getStatus(),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        order.setStatus(OrderStatus.CANCELED);
+        paymentService.refundPayments(orderId);
+        return orderRepository.save(order);
+    }
 
     @Override
     public Order createOrder(CreateOrderRequest request) {
@@ -43,12 +94,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .client(client)
                 .promoCode(request.promoCode())
-                .items(new java.util.ArrayList<>())
+                .items(new ArrayList<>())
                 .build();
+
+        if (request.promoCode() != null && !request.promoCode().isBlank()) {
+            if (orderRepository.existsByClientIdAndPromoCode(request.clientId(), request.promoCode())) {
+                throw new BusinessRuleViolationException(
+                        "Promo code '" + request.promoCode() + "' has already been used by this client");
+            }
+        }
 
         for (var itemRequest : request.items()) {
             Product product = productRepository.findById(itemRequest.productId())
-                    .orElseThrow(() -> new BusinessException("Product not found: " + itemRequest.productId(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new BusinessException("Product not found: " + itemRequest.productId(),
+                            HttpStatus.NOT_FOUND));
 
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
@@ -72,11 +131,11 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("Order must contain at least one item", HttpStatus.BAD_REQUEST);
         }
 
-        // Set product info and prices for each item (stock validation happens at confirmation, not creation)
+        // stock validation happens at confirmation, not creation
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findById(item.getProduct().getId())
-                    .orElseThrow(() -> new BusinessException("Product not found: " + item.getProduct().getId(), HttpStatus.NOT_FOUND));
-
+                    .orElseThrow(() -> new BusinessException("Product not found: " + item.getProduct().getId(),
+                            HttpStatus.NOT_FOUND));
 
             item.setProduct(product);
             item.setUnitPrice(product.getPrice());
@@ -101,7 +160,8 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal amountHTAfterDiscount = subtotalHT.subtract(totalDiscount);
         amountHTAfterDiscount = MoneyUtil.round(amountHTAfterDiscount);
 
-        BigDecimal vat = MoneyUtil.calculatePercentage(amountHTAfterDiscount, vatRate.multiply(new BigDecimal("100")).doubleValue());
+        BigDecimal vat = MoneyUtil.calculatePercentage(amountHTAfterDiscount,
+                vatRate.multiply(new BigDecimal("100")).doubleValue());
 
         BigDecimal totalTTC = amountHTAfterDiscount.add(vat);
         totalTTC = MoneyUtil.round(totalTTC);
@@ -185,55 +245,30 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.deleteById(orderId);
     }
 
-    @Override
-    public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException("Order not found", HttpStatus.NOT_FOUND));
-
-        if (newStatus == OrderStatus.CONFIRMED && order.getStatus() != OrderStatus.CONFIRMED) {
-            return confirmOrder(orderId);
-        }
-
-        if (order.getStatus() == OrderStatus.CONFIRMED ||
-            order.getStatus() == OrderStatus.REJECTED ||
-            order.getStatus() == OrderStatus.CANCELED) {
-            throw new BusinessException(
-                "Cannot modify order with final status: " + order.getStatus(),
-                HttpStatus.valueOf(422)
-            );
-        }
-
-        order.setStatus(newStatus);
-        return orderRepository.save(order);
-    }
-
     private Order confirmOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException("Order not found", HttpStatus.NOT_FOUND));
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new BusinessException(
-                "Only PENDING orders can be confirmed. Current status: " + order.getStatus(),
-                HttpStatus.valueOf(422)
-            );
+                    "Only PENDING orders can be confirmed. Current status: " + order.getStatus(),
+                    HttpStatus.valueOf(422));
         }
 
         if (!order.isFullyPaid()) {
             throw new BusinessException(
-                "Order cannot be confirmed until fully paid. Remaining: " + order.getRemainingBalance(),
-                HttpStatus.valueOf(422)
-            );
+                    "Order cannot be confirmed until fully paid. Remaining: " + order.getRemainingBalance(),
+                    HttpStatus.valueOf(422));
         }
 
-        // Validate stock availability at confirmation time (not at creation)
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findById(item.getProduct().getId())
                     .orElseThrow(() -> new BusinessException("Product not found", HttpStatus.NOT_FOUND));
 
-            // If stock insufficient, REJECT the order instead of confirming
             if (product.getStockQuantity() < item.getQuantity()) {
-                order.setStatus(OrderStatus.REJECTED);
-                return orderRepository.save(order);
+                throw new BusinessRuleViolationException(
+                        "Insufficient stock for product '" + product.getName() + "'. Available: " +
+                                product.getStockQuantity() + ", Requested: " + item.getQuantity());
             }
         }
 
@@ -247,6 +282,12 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Client client = order.getClient();
+
+        if (client.getFirstOrderDate() == null) {
+            client.setFirstOrderDate(LocalDateTime.now());
+        }
+        client.setLastOrderDate(LocalDateTime.now());
+
         client.updateStats(order.getTotalTTC());
         clientRepository.save(client);
 
@@ -254,22 +295,4 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    @Override
-    public Order cancelOrder(Long orderId, Long clientId) {
-        Order order = getOrderForClient(orderId, clientId)
-                .orElseThrow(() -> new BusinessException(
-                        "Order not found or you don't have permission to cancel this order",
-                        HttpStatus.FORBIDDEN
-                ));
-
-        if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.CANCELED) {
-            throw new BusinessException(
-                    "Cannot cancel order with status: " + order.getStatus(),
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        order.setStatus(OrderStatus.CANCELED);
-        return orderRepository.save(order);
-    }
 }

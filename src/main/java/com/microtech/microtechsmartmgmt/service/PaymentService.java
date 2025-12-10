@@ -12,5 +12,6 @@ public interface PaymentService {
     List<Payment> getOrderPayments(Long orderId);
 
     Payment updatePaymentStatus(Long paymentId, String status);
-}
 
+    void refundPayments(Long orderId);
+}

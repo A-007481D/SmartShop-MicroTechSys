@@ -1,5 +1,6 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.microtech.microtechsmartmgmt.enums.PaymentStatus;
 import com.microtech.microtechsmartmgmt.enums.PaymentType;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 public class Payment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Order order;
 
     private Integer paymentNumber; // sequential per order

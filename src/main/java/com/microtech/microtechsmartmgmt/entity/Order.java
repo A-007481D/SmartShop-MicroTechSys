@@ -1,9 +1,11 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.microtech.microtechsmartmgmt.enums.OrderStatus;
 import com.microtech.microtechsmartmgmt.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,7 +18,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Order extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,11 +40,17 @@ public class Order extends BaseEntity {
 
     private String promoCode;
 
+    @Column(name = "sub_total")
     private BigDecimal subTotal;
-    private BigDecimal discountAmount;
-    private BigDecimal taxAmount;
-    private BigDecimal totalTTC;
 
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
+
+    @Column(name = "tax_amount")
+    private BigDecimal taxAmount;
+
+    @Column(name = "total_ttc")
+    private BigDecimal totalTTC;
 
     public BigDecimal getRemainingBalance() {
         if (totalTTC == null) {

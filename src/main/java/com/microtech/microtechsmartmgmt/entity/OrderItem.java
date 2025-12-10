@@ -1,10 +1,12 @@
 package com.microtech.microtechsmartmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "order_items")
 @Getter
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 public class OrderItem extends BaseEntity {
     @JoinColumn(name = "order_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Order order;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
