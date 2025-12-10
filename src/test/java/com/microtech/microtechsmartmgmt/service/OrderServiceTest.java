@@ -10,6 +10,8 @@ import com.microtech.microtechsmartmgmt.repository.ClientRepository;
 import com.microtech.microtechsmartmgmt.repository.OrderRepository;
 import com.microtech.microtechsmartmgmt.repository.ProductRepository;
 import com.microtech.microtechsmartmgmt.service.impl.OrderServiceImpl;
+import com.microtech.microtechsmartmgmt.service.PaymentService;
+import com.microtech.microtechsmartmgmt.exception.BusinessRuleViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,8 @@ class OrderServiceTest {
         private ClientRepository clientRepository;
         @Mock
         private ProductRepository productRepository;
+        @Mock
+        private PaymentService paymentService;
 
         @InjectMocks
         private OrderServiceImpl orderService;
@@ -95,10 +99,10 @@ class OrderServiceTest {
                                 .status(OrderStatus.PENDING)
                                 .totalTTC(new BigDecimal("1200.00"))
                                 .items(List.of(OrderItem.builder()
-                                                                .product(product)
-                                                                .quantity(2)
-                                                                .build()))
-                                .build();
+                                                .product(product)
+                                                .quantity(2)
+                                                .build()))
+                        .build();
 
                 Payment payment = Payment
                                 .builder()
@@ -118,5 +122,46 @@ class OrderServiceTest {
                 assertEquals(8, product.getStockQuantity());
                 assertEquals(1, client.getTotalOrders());
                 assertEquals(new BigDecimal("1200.00"), client.getTotalSpent());
+        }
+
+        @Test
+        void confirmOrder_ShouldThrowException_WhenStockIsLow() {
+                Client client = Client.builder().id(1L).build();
+                Product product = Product.builder().id(1L).stockQuantity(1).name("Laptop").build();
+                Order order = Order.builder()
+                                .id(1L)
+                                .client(client)
+                                .status(OrderStatus.PENDING)
+                                .items(List.of(OrderItem.builder().product(product).quantity(2).build()))
+                                .build();
+
+                order.getPayments().add(Payment.builder().amount(BigDecimal.TEN).status(PaymentStatus.COMPLETED).build());
+                order.setTotalTTC(BigDecimal.TEN);
+
+                when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+                when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+                assertThrows(BusinessRuleViolationException.class, () -> {
+                        orderService.updateOrderStatus(1L, OrderStatus.CONFIRMED);
+                });
+        }
+
+        @Test
+        void cancelOrder_ShouldRefundPayments() {
+                Client client = Client.builder().id(1L).build();
+                Order order = Order.builder()
+                                .id(1L)
+                                .client(client)
+                                .status(OrderStatus.PENDING)
+                                .build();
+
+                when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+                when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+                Order result = orderService.updateOrderStatus(1L, OrderStatus.REJECTED);
+
+                assertEquals(OrderStatus.REJECTED, result.getStatus());
+                verify(paymentService, times(1)).refundPayments(1L);
         }
 }

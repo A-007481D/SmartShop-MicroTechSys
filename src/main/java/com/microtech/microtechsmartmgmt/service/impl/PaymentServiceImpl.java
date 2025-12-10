@@ -39,16 +39,14 @@ public class PaymentServiceImpl implements PaymentService {
         if (request.amount().compareTo(remainingBalance) > 0) {
             throw new BusinessRuleViolationException(
                     "Payment amount (" + request.amount() + " DH) exceeds remaining balance (" +
-                            remainingBalance + " DH)"
-            );
+                            remainingBalance + " DH)");
         }
 
         if (request.paymentType() == PaymentType.CASH) {
             if (request.amount().compareTo(CASH_LIMIT) > 0) {
                 throw new BusinessRuleViolationException(
                         "Cash payment cannot exceed 20,000 DH (legal limit). Amount: " +
-                                request.amount() + " DH"
-                );
+                                request.amount() + " DH");
             }
         }
 
@@ -131,5 +129,18 @@ public class PaymentServiceImpl implements PaymentService {
         return PaymentStatus.PENDING;
     }
 
-}
+    @Override
+    public void refundPayments(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
 
+        List<Payment> payments = order.getPayments();
+        for (Payment payment : payments) {
+            if (payment.getStatus() == PaymentStatus.COMPLETED) {
+                payment.setStatus(PaymentStatus.REFUNDED);
+                paymentRepository.save(payment);
+            }
+        }
+    }
+
+}
