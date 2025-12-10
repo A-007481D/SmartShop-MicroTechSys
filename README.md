@@ -105,3 +105,8 @@ The API follows RESTful principles and uses JSON for data exchange.
 The project employs a dual-layer testing strategy:
 1.  **Unit Tests**: JUnit and Mockito are used to verify core business logic in isolation, particularly for the Order, Client, and Payment services.
 2.  **End-to-End (E2E) Tests**: Shell scripts (`test-api.sh`, `full_system_test.sh`) are provided to validate complete user flows and API interactions against a running instance.
+
+
+## Jira Link 
+
+https://labidabdelmalek-1738768893339.atlassian.net/jira/software/c/projects/SMARS/boards/200?atlOrigin=eyJpIjoiZmI3ZTJmN2IwZDQ0NDUzM2E0YmM4NjA5NWQzY2Y1MTQiLCJwIjoiaiJ9
