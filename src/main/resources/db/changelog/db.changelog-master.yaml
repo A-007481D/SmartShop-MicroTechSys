@@ -20,5 +20,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelog-007-client-dates.yaml
   - include:
-      file: changelog-008-product-active.yaml
-      relativeToChangelogFile: true
+      file: db/changelog/changelog-008-product-active.yaml
+  - include:
+      file: db/changelog/changelog-009-user-active.yaml

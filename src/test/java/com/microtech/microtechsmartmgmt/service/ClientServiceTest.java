@@ -31,7 +31,7 @@ class ClientServiceTest {
                 .id(1L)
                 .tier(CustomerTier.BASIC)
                 .totalOrders(2)
-                .totalSpent(new BigDecimal("900.00"))
+                .turnover(new BigDecimal("900.00"))
                 .build();
 
         client.updateStats(new BigDecimal("200.00"));
@@ -45,7 +45,7 @@ class ClientServiceTest {
                 .id(1L)
                 .tier(CustomerTier.SILVER)
                 .totalOrders(9)
-                .totalSpent(new BigDecimal("4000.00"))
+                .turnover(new BigDecimal("4000.00"))
                 .build();
 
         client.updateStats(new BigDecimal("100.00"));

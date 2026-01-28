@@ -3,7 +3,9 @@ package com.microtech.microtechsmartmgmt.service.impl;
 import com.microtech.microtechsmartmgmt.dto.request.CreateClientRequest;
 import com.microtech.microtechsmartmgmt.dto.request.UpdateClientRequest;
 import com.microtech.microtechsmartmgmt.entity.Client;
+import com.microtech.microtechsmartmgmt.entity.Order;
 import com.microtech.microtechsmartmgmt.enums.CustomerTier;
+import com.microtech.microtechsmartmgmt.enums.OrderStatus;
 import com.microtech.microtechsmartmgmt.enums.UserRole;
 import com.microtech.microtechsmartmgmt.exception.BusinessException;
 import com.microtech.microtechsmartmgmt.exception.ResourceNotFoundException;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +67,7 @@ public class ClientServiceImpl implements ClientService {
                 .email(request.email())
                 .tier(CustomerTier.BASIC)
                 .totalOrders(0)
-                .totalSpent(BigDecimal.ZERO)
+                .turnover(BigDecimal.ZERO)
                 .build();
 
         return clientRepository.save(client);
@@ -98,5 +102,24 @@ public class ClientServiceImpl implements ClientService {
         }
         clientRepository.deleteById(clientId);
     }
-}
 
+    // Récupérer le client qui a passé le plus grand nombre de commandes dans le
+    // système.
+    // On ne compte que les commandes avec le statut VALIDATED.
+    // On ne prend en compte que les clients actifs (active = true).
+    // S’il n’y a aucune commande, on lève une BusinessException avec un message du
+    // style :
+    // "Aucune commande trouvée pour calculer le meilleur client."
+
+    // group par client et compter les commandes validées
+
+    public Client getBestClient(List<Order> commandes) {
+        return commandes.stream()
+                .filter(c -> c.getStatus() == OrderStatus.CONFIRMED)
+                .filter(client -> client.getClient().isActive())
+                .collect(Collectors.groupingBy(Order::getClient, Collectors.counting()))
+                .entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
+                .orElseThrow(() -> new BusinessException("Aucune commande trouvée pour calculer le meilleur client."));
+    }
+
+}

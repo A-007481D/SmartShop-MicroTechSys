@@ -20,9 +20,8 @@ public class ClientResponse {
     private String email;
     private CustomerTier tier;
     private Integer totalOrders;
-    private BigDecimal totalSpent;
+    private BigDecimal turnover;
     private LocalDateTime firstOrderDate;
     private LocalDateTime lastOrderDate;
     private LocalDateTime createdAt;
 }
-
