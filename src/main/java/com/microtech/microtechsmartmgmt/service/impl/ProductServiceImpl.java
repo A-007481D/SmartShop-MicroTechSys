@@ -1,6 +1,7 @@
 package com.microtech.microtechsmartmgmt.service.impl;
 
 import com.microtech.microtechsmartmgmt.entity.Product;
+import com.microtech.microtechsmartmgmt.exception.BusinessException;
 import com.microtech.microtechsmartmgmt.exception.BusinessRuleViolationException;
 import com.microtech.microtechsmartmgmt.exception.ResourceNotFoundException;
 import com.microtech.microtechsmartmgmt.repository.OrderItemRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,6 +60,14 @@ public class ProductServiceImpl implements ProductService {
             productRepository.deleteById(id);
         }
     }
+
+
+
+//    public Product getProductWithOrders(Long productId) {
+//        return productRepository.findById(productId)
+//                .filter(orderItemRepository::existsByProduct)
+//                .orElseThrow(() -> new BusinessException("Product not found or has never been ordered."));
+//    }
 
     @Override
     @Transactional(readOnly = true)

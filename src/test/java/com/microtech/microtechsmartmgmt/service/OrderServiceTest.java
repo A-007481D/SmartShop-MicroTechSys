@@ -84,7 +84,7 @@ class OrderServiceTest {
                                 .id(1L)
                                 .tier(CustomerTier.BASIC)
                                 .totalOrders(0)
-                                .totalSpent(BigDecimal.ZERO)
+                                .turnover(BigDecimal.ZERO)
                                 .build();
 
                 Product product = Product.builder()
@@ -102,7 +102,7 @@ class OrderServiceTest {
                                                 .product(product)
                                                 .quantity(2)
                                                 .build()))
-                        .build();
+                                .build();
 
                 Payment payment = Payment
                                 .builder()
@@ -121,7 +121,7 @@ class OrderServiceTest {
                 assertEquals(OrderStatus.CONFIRMED, result.getStatus());
                 assertEquals(8, product.getStockQuantity());
                 assertEquals(1, client.getTotalOrders());
-                assertEquals(new BigDecimal("1200.00"), client.getTotalSpent());
+                assertEquals(new BigDecimal("1200.00"), client.getTurnover());
         }
 
         @Test
@@ -135,7 +135,8 @@ class OrderServiceTest {
                                 .items(List.of(OrderItem.builder().product(product).quantity(2).build()))
                                 .build();
 
-                order.getPayments().add(Payment.builder().amount(BigDecimal.TEN).status(PaymentStatus.COMPLETED).build());
+                order.getPayments()
+                                .add(Payment.builder().amount(BigDecimal.TEN).status(PaymentStatus.COMPLETED).build());
                 order.setTotalTTC(BigDecimal.TEN);
 
                 when(orderRepository.findById(1L)).thenReturn(Optional.of(order));

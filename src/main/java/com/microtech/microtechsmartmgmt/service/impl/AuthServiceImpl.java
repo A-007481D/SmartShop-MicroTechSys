@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
                 .fullName(request.fullName())
                 .tier(CustomerTier.BASIC)
                 .totalOrders(0)
-                .totalSpent(BigDecimal.ZERO)
+                .turnover(BigDecimal.ZERO)
                 .build();
 
         Client savedClient = clientRepository.save(newClient);
@@ -69,7 +69,6 @@ public class AuthServiceImpl implements AuthService {
                 savedClient.getId(),
                 savedClient.getUsername(),
                 savedClient.getRole(),
-                "Client registered successfully"
-        );
+                "Client registered successfully");
     }
 }

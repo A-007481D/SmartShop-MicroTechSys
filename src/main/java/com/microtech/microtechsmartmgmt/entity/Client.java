@@ -36,7 +36,8 @@ public class Client extends User {
     private int totalOrders = 0;
 
     @Builder.Default
-    private BigDecimal totalSpent = BigDecimal.ZERO;
+    @Column(name = "total_spent")
+    private BigDecimal turnover = BigDecimal.ZERO;
 
     @JsonIgnore
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
@@ -44,17 +45,17 @@ public class Client extends User {
 
     public void updateStats(BigDecimal orderAmount) {
         this.totalOrders++;
-        this.totalSpent = this.totalSpent.add(orderAmount);
+        this.turnover = this.turnover.add(orderAmount);
         recalculateTier();
 
     }
 
     private void recalculateTier() {
-        if (totalOrders >= 20 || totalSpent.compareTo(new BigDecimal("15000")) >= 0) {
+        if (totalOrders >= 20 || turnover.compareTo(new BigDecimal("15000")) >= 0) {
             this.tier = CustomerTier.PLATINUM;
-        } else if (totalOrders >= 10 || totalSpent.compareTo(new BigDecimal("5000")) >= 0) {
+        } else if (totalOrders >= 10 || turnover.compareTo(new BigDecimal("5000")) >= 0) {
             this.tier = CustomerTier.GOLD;
-        } else if (totalOrders >= 3 || totalSpent.compareTo(new BigDecimal("1000")) >= 0) {
+        } else if (totalOrders >= 3 || turnover.compareTo(new BigDecimal("1000")) >= 0) {
             this.tier = CustomerTier.SILVER;
         } else {
             this.tier = CustomerTier.BASIC;
