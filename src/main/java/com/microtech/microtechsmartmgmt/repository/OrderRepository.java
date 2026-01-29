@@ -18,5 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatus(OrderStatus status);
 
     List<Order> findByClientIdAndStatus(Long clientId, OrderStatus status);
-    // deleted by id is inherited from jparepo
+
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = 'CONFIRMED' OR o.status = 'DELIVERED' OR o.status = 'COMPLETED'")
+    java.math.BigDecimal sumTotalRevenue();
 }

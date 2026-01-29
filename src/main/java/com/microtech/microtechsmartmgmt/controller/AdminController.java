@@ -33,6 +33,33 @@ public class AdminController {
     private final ClientMapper clientMapper;
     private final OrderMapper orderMapper;
 
+    // Inject repositories for stats
+    private final com.microtech.microtechsmartmgmt.repository.OrderRepository orderRepository;
+    private final com.microtech.microtechsmartmgmt.repository.ClientRepository clientRepository;
+
+    @GetMapping("/dashboard-stats")
+    @RequireRole(UserRole.ADMIN)
+    public ResponseEntity<com.microtech.microtechsmartmgmt.dto.response.DashboardStatsResponse> getDashboardStats() {
+        java.math.BigDecimal totalRevenue = orderRepository.sumTotalRevenue();
+        if (totalRevenue == null)
+            totalRevenue = java.math.BigDecimal.ZERO;
+
+        long totalOrders = orderRepository.count();
+        long activeClients = clientRepository.count(); // Assuming all clients are active for now
+
+        java.math.BigDecimal avgOrderValue = java.math.BigDecimal.ZERO;
+        if (totalOrders > 0) {
+            avgOrderValue = totalRevenue.divide(java.math.BigDecimal.valueOf(totalOrders), 2,
+                    java.math.RoundingMode.HALF_UP);
+        }
+
+        return ResponseEntity.ok(new com.microtech.microtechsmartmgmt.dto.response.DashboardStatsResponse(
+                totalRevenue,
+                totalOrders,
+                activeClients,
+                avgOrderValue));
+    }
+
     @GetMapping("/clients")
     @RequireRole(UserRole.ADMIN)
     public ResponseEntity<Page<ClientResponse>> getAllClients(Pageable pageable) {
@@ -95,8 +122,7 @@ public class AdminController {
             @PathVariable Long orderId,
             @RequestParam OrderStatus status) {
         OrderResponse order = orderMapper.toResponse(
-                orderService.updateOrderStatus(orderId, status)
-        );
+                orderService.updateOrderStatus(orderId, status));
         return ResponseEntity.ok(order);
     }
 }

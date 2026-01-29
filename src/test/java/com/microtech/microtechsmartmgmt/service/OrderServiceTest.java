@@ -10,7 +10,7 @@ import com.microtech.microtechsmartmgmt.repository.ClientRepository;
 import com.microtech.microtechsmartmgmt.repository.OrderRepository;
 import com.microtech.microtechsmartmgmt.repository.ProductRepository;
 import com.microtech.microtechsmartmgmt.service.impl.OrderServiceImpl;
-import com.microtech.microtechsmartmgmt.service.PaymentService;
+
 import com.microtech.microtechsmartmgmt.exception.BusinessRuleViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

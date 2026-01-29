@@ -52,6 +52,19 @@ public class Order extends BaseEntity {
     @Column(name = "total_ttc")
     private BigDecimal totalTTC;
 
+    @Column(nullable = false)
+    private java.time.LocalDateTime orderDate;
+
+    @Column(nullable = false)
+    private java.math.BigDecimal totalAmount;
+
+    @PrePersist
+    protected void onCreate() {
+        if (orderDate == null) {
+            orderDate = java.time.LocalDateTime.now();
+        }
+    }
+
     public BigDecimal getRemainingBalance() {
         if (totalTTC == null) {
             return BigDecimal.ZERO;
