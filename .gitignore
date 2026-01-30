@@ -39,4 +39,18 @@ scripts/demo-data.sql
 cookies*.txt
 app.log
 liquibase.log
-src/main/java/com/microtech/microtechsmartmgmt/config/DataInitializer.java
+
+
+# Large/Temp files
+*.zip
+html.html
+proMoi.png
+diagrams/v0.18.0*
+coverage/
+
+# Documentation and Scripts (Local)
+dcs/
+scripts/
+API_REFERENCE.md
+diagrams/
+*.mermaid
