@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react';
 import { getMyProfile, getMyOrders } from '../../api/clientApi';
 import type { OrderSummary } from '../../api/clientApi';
 import type { Client } from '../../api/adminApi';
-import StatCard from '../../components/dashboard/StatCard';
-import { ShoppingBag, DollarSign, Award, LogOut } from 'lucide-react';
+import { ShoppingBag, LogOut, Star } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
+
+const TIER_CONFIG = {
+    BASIC: { color: 'gray', discount: 0, next: 'SILVER', threshold: 1000 },
+    SILVER: { color: 'slate', discount: 5, next: 'GOLD', threshold: 5000 },
+    GOLD: { color: 'yellow', discount: 10, next: 'PLATINUM', threshold: 20000 },
+    PLATINUM: { color: 'purple', discount: 15, next: null, threshold: null }
+};
 
 export default function ClientProfile() {
     const [profile, setProfile] = useState<Client | null>(null);
@@ -42,6 +48,8 @@ export default function ClientProfile() {
     if (loading) return <div className="p-8">Loading profile...</div>;
     if (!profile) return <div className="p-8 text-red-600">Failed to load profile.</div>;
 
+    const tierInfo = TIER_CONFIG[profile.tier];
+
     return (
         <div className="max-w-6xl mx-auto p-6 md:p-8 space-y-8">
             <div className="flex justify-between items-center">
@@ -49,32 +57,35 @@ export default function ClientProfile() {
                     <h1 className="text-3xl font-bold text-gray-800">My Dashboard</h1>
                     <p className="text-gray-500">Welcome back, {profile.fullName}</p>
                 </div>
-                <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50">
-                    <LogOut size={18} />
-                    Sign Out
-                </Button>
+                <div className="flex items-center gap-4">
+                    <div className={`px-4 py-2 rounded-full flex items-center gap-2 font-semibold
+                        ${profile.tier === 'PLATINUM' ? 'bg-purple-100 text-purple-800' :
+                            profile.tier === 'GOLD' ? 'bg-yellow-100 text-yellow-800' :
+                                profile.tier === 'SILVER' ? 'bg-gray-200 text-gray-800' :
+                                    'bg-gray-100 text-gray-600'}`}>
+                        <Star size={16} fill="currentColor" />
+                        {profile.tier} • {tierInfo.discount}% Off
+                    </div>
+                    <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50">
+                        <LogOut size={18} />
+                        Sign Out
+                    </Button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard
-                    title="My Spending"
-                    value={`$${profile.turnover.toLocaleString()}`}
-                    icon={DollarSign}
-                    color="green"
-                />
-                <StatCard
-                    title="My Orders"
-                    value={orders.length.toString()}
-                    icon={ShoppingBag}
-                    color="blue"
-                />
-                <StatCard
-                    title="My Loyalty Tier"
-                    value={profile.tier}
-                    icon={Award}
-                    color="purple"
-                />
-            </div>
+            {tierInfo.next && (
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl border border-purple-100">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-purple-800 font-medium">🎯 Progress to {tierInfo.next}</p>
+                            <p className="text-xs text-purple-600">Spend ${((tierInfo.threshold || 0) - profile.turnover).toLocaleString()} more to unlock {TIER_CONFIG[tierInfo.next as keyof typeof TIER_CONFIG].discount}% discount!</p>
+                        </div>
+                        <div className="w-48 h-3 bg-purple-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all" style={{ width: `${Math.min((profile.turnover / (tierInfo.threshold || 1)) * 100, 100)}%` }} />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-800 mb-6">Personal Information</h2>
