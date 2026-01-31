@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getAdminOrders, updateOrderStatus } from '../../api/orderApi';
 import type { Order } from '../../api/orderApi';
-import { Eye } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../components/ui/Button';
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -45,6 +46,9 @@ export default function OrdersPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-800">Order Management</h1>
+                <Button variant="primary" onClick={() => navigate('/admin/orders/new')} className="w-auto flex items-center gap-2">
+                    <Plus size={18} /> New Order
+                </Button>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">

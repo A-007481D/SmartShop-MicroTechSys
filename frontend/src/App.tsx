@@ -8,6 +8,7 @@ import ClientDetailsPage from './pages/admin/ClientDetailsPage';
 import ProductsPage from './pages/admin/ProductsPage';
 import OrdersPage from './pages/admin/OrdersPage';
 import OrderDetailsPage from './pages/admin/OrderDetailsPage';
+import CreateOrderPage from './pages/admin/CreateOrderPage';
 import ClientProfile from './pages/client/ClientProfile';
 import ProductCatalog from './pages/client/ProductCatalog';
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="clients/:id" element={<ClientDetailsPage />} />
             <Route path="products" element={<ProductsPage />} />
             <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/new" element={<CreateOrderPage />} />
             <Route path="orders/:id" element={<OrderDetailsPage />} />
           </Route>
         </Route>
