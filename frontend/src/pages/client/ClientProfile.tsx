@@ -67,8 +67,6 @@ export default function ClientProfile() {
                     value={profile.tier}
                     icon={Award}
                     color="purple"
-                    trend="Get 5% off" // Mock
-                    trendUp={true}
                 />
             </div>
 

@@ -2,7 +2,6 @@ import authReducer, { loginUser, logout } from './authSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import { vi } from 'vitest';
 
-// Mock authApi
 vi.mock('../../api/authApi', () => ({
     login: vi.fn(),
     logout: vi.fn(),
@@ -19,7 +18,6 @@ describe('authSlice', () => {
             }
         });
         vi.clearAllMocks();
-        // Mock loginUser thunk to return fulfilled action
         (loginUser as any).mockReturnValue(() => {
             return Promise.resolve({
                 type: 'auth/loginUser/fulfilled',
@@ -27,7 +25,6 @@ describe('authSlice', () => {
                 meta: { requestStatus: 'fulfilled' }
             });
         });
-        // Mock fulfilled property for matchers
         (loginUser as any).fulfilled = {
             match: (action: any) => action.type === 'auth/loginUser/fulfilled'
         };
@@ -71,7 +68,7 @@ describe('authSlice', () => {
             preloadedState: {
                 auth: {
                     isAuthenticated: true,
-                    user: { username: 'testuser', role: 'CLIENT' as const }, // Fix: Cast role as const or match enum
+                    user: { username: 'testuser', role: 'CLIENT' as const },
                     status: 'succeeded',
                     error: null,
                 }

@@ -5,7 +5,9 @@ import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ClientsPage from './pages/admin/ClientsPage';
 import ClientDetailsPage from './pages/admin/ClientDetailsPage';
+import ProductsPage from './pages/admin/ProductsPage';
 import ClientProfile from './pages/client/ClientProfile';
+import ProductCatalog from './pages/client/ProductCatalog';
 
 const Unauthorized = () => (
   <div className="p-8 text-center">
@@ -29,7 +31,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="clients" element={<ClientsPage />} />
             <Route path="clients/:id" element={<ClientDetailsPage />} />
-            <Route path="products" element={<div>Products List Placeholder</div>} />
+            <Route path="products" element={<ProductsPage />} />
             <Route path="orders" element={<div>Orders List Placeholder</div>} />
           </Route>
         </Route>
@@ -37,6 +39,7 @@ function App() {
         {/* Client Routes */}
         <Route element={<RequireAuth allowedRoles={['CLIENT']} />}>
           <Route path="/client/profile" element={<ClientProfile />} />
+          <Route path="/products" element={<ProductCatalog />} />
         </Route>
 
         {/* Default Redirect */}

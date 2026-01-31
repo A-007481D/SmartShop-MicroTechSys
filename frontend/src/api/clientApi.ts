@@ -1,6 +1,5 @@
 import api from './axios';
-import type { Client } from './adminApi'; // Reuse Client interface or define new if different view
-// Start with reuse for simplicity 
+import type { Client } from './adminApi';
 
 export interface OrderSummary {
     id: number;

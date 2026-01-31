@@ -14,7 +14,6 @@ vi.mock('../store/slices/authSlice', async () => {
     };
 });
 
-// Helper to render with providers
 const renderWithProviders = (
     ui: React.ReactElement,
     { preloadedState = {}, store = configureStore({ reducer: { auth: authReducer }, preloadedState }) } = {}
@@ -34,8 +33,7 @@ const renderWithProviders = (
 describe('LoginPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        // Setup default mock return for loginUser to act like a thunk
-        // It needs to return a function that returns the result action
+    
         (loginUser as any).mockReturnValue(() => {
             return Promise.resolve({
                 type: 'auth/loginUser/fulfilled',
@@ -43,7 +41,6 @@ describe('LoginPage', () => {
                 meta: { requestStatus: 'fulfilled' }
             });
         });
-        // Also need to property of 'fulfilled' match
         (loginUser as any).fulfilled = {
             match: (action: any) => action.type === 'auth/loginUser/fulfilled'
         };

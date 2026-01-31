@@ -50,8 +50,6 @@ export default function ClientDetailsPage() {
                     value={`$${client.turnover.toLocaleString()}`}
                     icon={DollarSign}
                     color="green"
-                    trend="+12%" // Mock trend
-                    trendUp={true}
                 />
                 <StatCard
                     title="Total Orders"
