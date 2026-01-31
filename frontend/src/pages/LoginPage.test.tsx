@@ -36,7 +36,7 @@ describe('LoginPage', () => {
         vi.clearAllMocks();
         // Setup default mock return for loginUser to act like a thunk
         // It needs to return a function that returns the result action
-        (loginUser as any).mockReturnValue((dispatch: any) => {
+        (loginUser as any).mockReturnValue(() => {
             return Promise.resolve({
                 type: 'auth/loginUser/fulfilled',
                 payload: { username: 'testuser', role: 'CLIENT' },
@@ -57,7 +57,7 @@ describe('LoginPage', () => {
     });
 
     it('submits form with credentials', async () => {
-        const { store } = renderWithProviders(<LoginPage />);
+        const { } = renderWithProviders(<LoginPage />);
 
         fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'testuser' } });
         fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password' } });
@@ -70,7 +70,7 @@ describe('LoginPage', () => {
 
     it('displays error on failed login', async () => {
         // Mock failure
-        (loginUser as any).mockReturnValue((dispatch: any) => {
+        (loginUser as any).mockReturnValue(() => {
             return Promise.resolve({
                 type: 'auth/loginUser/rejected',
                 payload: 'Invalid credentials',

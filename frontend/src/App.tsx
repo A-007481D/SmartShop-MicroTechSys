@@ -3,14 +3,9 @@ import LoginPage from './pages/LoginPage';
 import RequireAuth from './components/auth/RequireAuth';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
-
-// Placeholder components
-const ClientProfile = () => (
-  <div className="p-8">
-    <h1 className="text-2xl font-bold text-gray-800">Client Profile</h1>
-    <p>Welcome to your profile.</p>
-  </div>
-);
+import ClientsPage from './pages/admin/ClientsPage';
+import ClientDetailsPage from './pages/admin/ClientDetailsPage';
+import ClientProfile from './pages/client/ClientProfile';
 
 const Unauthorized = () => (
   <div className="p-8 text-center">
@@ -32,7 +27,8 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="clients" element={<div>Clients List Placeholder</div>} />
+            <Route path="clients" element={<ClientsPage />} />
+            <Route path="clients/:id" element={<ClientDetailsPage />} />
             <Route path="products" element={<div>Products List Placeholder</div>} />
             <Route path="orders" element={<div>Orders List Placeholder</div>} />
           </Route>
