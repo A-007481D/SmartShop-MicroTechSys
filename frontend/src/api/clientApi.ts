@@ -18,3 +18,8 @@ export const getMyOrders = async (): Promise<OrderSummary[]> => {
     const response = await api.get<OrderSummary[]>('/clients/me/orders');
     return response.data;
 };
+
+export const getMyOrderDetails = async (id: number): Promise<any> => {
+    const response = await api.get<any>(`/clients/me/orders/${id}`);
+    return response.data;
+};

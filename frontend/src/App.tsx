@@ -6,6 +6,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ClientsPage from './pages/admin/ClientsPage';
 import ClientDetailsPage from './pages/admin/ClientDetailsPage';
 import ProductsPage from './pages/admin/ProductsPage';
+import OrdersPage from './pages/admin/OrdersPage';
+import OrderDetailsPage from './pages/admin/OrderDetailsPage';
 import ClientProfile from './pages/client/ClientProfile';
 import ProductCatalog from './pages/client/ProductCatalog';
 
@@ -32,7 +34,8 @@ function App() {
             <Route path="clients" element={<ClientsPage />} />
             <Route path="clients/:id" element={<ClientDetailsPage />} />
             <Route path="products" element={<ProductsPage />} />
-            <Route path="orders" element={<div>Orders List Placeholder</div>} />
+            <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/:id" element={<OrderDetailsPage />} />
           </Route>
         </Route>
 

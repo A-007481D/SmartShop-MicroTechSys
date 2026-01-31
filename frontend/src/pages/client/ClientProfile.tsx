@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getMyProfile } from '../../api/clientApi';
+import { getMyProfile, getMyOrders } from '../../api/clientApi';
+import type { OrderSummary } from '../../api/clientApi';
 import type { Client } from '../../api/adminApi';
 import StatCard from '../../components/dashboard/StatCard';
 import { ShoppingBag, DollarSign, Award, LogOut } from 'lucide-react';
@@ -10,22 +11,27 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ClientProfile() {
     const [profile, setProfile] = useState<Client | null>(null);
+    const [orders, setOrders] = useState<OrderSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const loadProfile = async () => {
+        const loadData = async () => {
             try {
-                const data = await getMyProfile();
-                setProfile(data);
+                const [profileData, ordersData] = await Promise.all([
+                    getMyProfile(),
+                    getMyOrders()
+                ]);
+                setProfile(profileData);
+                setOrders(ordersData);
             } catch (err) {
-                console.error("Failed to load profile", err);
+                console.error("Failed to load profile data", err);
             } finally {
                 setLoading(false);
             }
         };
-        loadProfile();
+        loadData();
     }, []);
 
     const handleLogout = () => {
@@ -58,7 +64,7 @@ export default function ClientProfile() {
                 />
                 <StatCard
                     title="My Orders"
-                    value={profile.totalOrders.toString()}
+                    value={orders.length.toString()}
                     icon={ShoppingBag}
                     color="blue"
                 />
@@ -85,12 +91,44 @@ export default function ClientProfile() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Orders</h2>
-                <div className="text-center py-10 text-gray-400">
-                    <ShoppingBag size={48} className="mx-auto mb-3 opacity-20" />
-                    <p>No recent orders found.</p>
-                    <Button className="mt-4" variant="primary">Browse Products</Button>
-                </div>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Order History</h2>
+                {orders.length === 0 ? (
+                    <div className="text-center py-10 text-gray-400">
+                        <ShoppingBag size={48} className="mx-auto mb-3 opacity-20" />
+                        <p>No orders yet.</p>
+                        <Button className="mt-4" variant="primary" onClick={() => navigate('/products')}>Browse Products</Button>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {orders.map((order) => (
+                                    <tr key={order.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">#{order.id}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4 text-sm font-bold text-gray-900">${order.totalAmount.toFixed(2)}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
+                                                    order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-blue-100 text-blue-800'}`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

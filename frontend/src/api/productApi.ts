@@ -48,7 +48,7 @@ export const deleteProduct = async (id: number): Promise<void> => {
 // Client Endpoints
 
 export const getProducts = async (page = 0, size = 10): Promise<Page<Product>> => {
-    // Client sees /api/v1/products (active only)
+    // active only
     const response = await axios.get<Page<Product>>('/v1/products', {
         params: { page, size }
     });

@@ -18,7 +18,7 @@ export default function ProductCatalog() {
     const fetchProducts = async (pageNum: number) => {
         setLoading(true);
         try {
-            const data = await getProducts(pageNum, 12); // Grid layout prefer 12
+            const data = await getProducts(pageNum, 12);
             setProductsPage(data);
         } catch (err) {
             console.error("Failed to load products", err);

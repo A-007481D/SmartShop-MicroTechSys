@@ -118,7 +118,6 @@ export default function ProductsPage() {
                         </tbody>
                     </table>
                 </div>
-                {/* Pagination (Simplified for brevity, reuse logic from ClientsPage if componentized) */}
                 <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                     <Button
                         onClick={() => setPage(p => Math.max(0, p - 1))}

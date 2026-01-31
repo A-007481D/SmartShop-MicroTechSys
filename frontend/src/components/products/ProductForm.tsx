@@ -72,7 +72,6 @@ export default function ProductForm({ initialData, onSubmit, isLoading, onCancel
                     {...register('stockQuantity', { valueAsNumber: true })}
                 />
             </div>
-            {/* DEBUG removed */}
 
             <Input
                 label="SKU"
