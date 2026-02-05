@@ -11,6 +11,7 @@ import OrderDetailsPage from './pages/admin/OrderDetailsPage';
 import CreateOrderPage from './pages/admin/CreateOrderPage';
 import ClientProfile from './pages/client/ClientProfile';
 import ProductCatalog from './pages/client/ProductCatalog';
+import CheckoutPage from './pages/client/CheckoutPage';
 
 const Unauthorized = () => (
   <div className="p-8 text-center">
@@ -44,6 +45,7 @@ function App() {
         {/* Client Routes */}
         <Route element={<RequireAuth allowedRoles={['CLIENT']} />}>
           <Route path="/client/profile" element={<ClientProfile />} />
+          <Route path="/client/checkout" element={<CheckoutPage />} />
           <Route path="/products" element={<ProductCatalog />} />
         </Route>
 

@@ -54,3 +54,9 @@ scripts/
 API_REFERENCE.md
 diagrams/
 *.mermaid
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/

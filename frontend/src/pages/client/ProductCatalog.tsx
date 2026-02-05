@@ -4,12 +4,18 @@ import type { Product, Page } from '../../api/productApi';
 import Button from '../../components/ui/Button';
 import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { addToCart, selectCartItemCount, toggleCart } from '../../store/slices/cartSlice';
+import CartDrawer from '../../components/cart/CartDrawer';
 
 export default function ProductCatalog() {
     const [productsPage, setProductsPage] = useState<Page<Product> | null>(null);
     const [loading, setLoading] = useState(true);
+
     const [page, setPage] = useState(0);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const cartItemCount = useAppSelector(selectCartItemCount);
 
     useEffect(() => {
         fetchProducts(page);
@@ -33,10 +39,23 @@ export default function ProductCatalog() {
         <div className="max-w-7xl mx-auto p-6 space-y-8">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">Product Catalog</h1>
-                <Button variant="outline" className="w-auto flex items-center gap-2" onClick={() => navigate('/client/profile')}>
-                    Back to Dashboard
-                </Button>
+                <div className="flex gap-4">
+                    <Button variant="outline" className="w-auto flex items-center gap-2" onClick={() => navigate('/client/profile')}>
+                        Back to Dashboard
+                    </Button>
+                    <Button variant="primary" className="w-auto flex items-center gap-2 relative" onClick={() => dispatch(toggleCart())}>
+                        <ShoppingCart size={20} />
+                        {cartItemCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                                {cartItemCount}
+                            </span>
+                        )}
+                        Cart
+                    </Button>
+                </div>
             </div>
+
+            <CartDrawer />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {productsPage?.content.map((product) => (
@@ -53,7 +72,11 @@ export default function ProductCatalog() {
                             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{product.description}</p>
                             <div className="mt-auto pt-4 flex items-center justify-between">
                                 <span className="text-xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
-                                <Button className="w-auto p-2" variant="primary">
+                                <Button
+                                    className="w-auto p-2"
+                                    variant="primary"
+                                    onClick={() => dispatch(addToCart(product))}
+                                >
                                     <ShoppingCart size={20} />
                                 </Button>
                             </div>

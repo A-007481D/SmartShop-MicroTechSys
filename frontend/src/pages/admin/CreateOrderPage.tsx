@@ -4,7 +4,7 @@ import { createOrder } from '../../api/orderApi';
 import type { CreateOrderRequest } from '../../api/orderApi';
 import { getClients } from '../../api/adminApi';
 import type { Client } from '../../api/adminApi';
-import { getProducts } from '../../api/productApi';
+import { getAdminProducts } from '../../api/productApi';
 import type { Product } from '../../api/productApi';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -35,7 +35,7 @@ export default function CreateOrderPage() {
         try {
             const [clientsData, productsData] = await Promise.all([
                 getClients(),
-                getProducts()
+                getAdminProducts()
             ]);
             setClients(clientsData.content || []);
             setProducts(productsData.content || []);

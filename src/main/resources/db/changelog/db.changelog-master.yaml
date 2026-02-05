@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/changelog-008-product-active.yaml
   - include:
       file: db/changelog/changelog-009-user-active.yaml
+  - include:
+      file: db/changelog/changelog-010-order-date-total.yaml

@@ -1,73 +1,76 @@
-# React + TypeScript + Vite
+# SmartShop Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Overview
+SmartShop Frontend is a React-based web application for managing B2B commercial operations. It connects to a robust Spring Boot backend to provide role-based access for Admins and Clients.
 
-Currently, two official plugins are available:
+## Architecture
+The application follows a modular structure using Feature-First organization where appropriate.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```mermaid
+graph TD
+    User[User] --> Cloudflare[Reverse Proxy / Nginx]
+    Cloudflare --> ReactApp[React Frontend Container]
+    
+    subgraph Frontend Logic
+        ReactApp --> AppRouter[React Router]
+        AppRouter --> AuthGuard[Auth Guard HOC]
+        AuthGuard --> AdminRoutes[Admin Routes]
+        AuthGuard --> ClientRoutes[Client Routes]
+        
+        AdminRoutes --> Pages1[Dashboard, Orders, Clients, Products]
+        ClientRoutes --> Pages2[Profile, Catalog, Checkout]
+        
+        Pages1 --> Redux[Redux Store]
+        Pages2 --> Redux
+        
+        Pages1 --> API[Axios API Client]
+        Pages2 --> API
+    end
+    
+    API --> Backend[Backend REST API]
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Role Management
+- **Admins**: Full control over Clients, Products, and Orders. Can create orders on behalf of clients.
+- **Clients**: Self-service portal to view catalog, manage profile, and place orders via a Shopping Cart.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Key Components
+- **State Management**: Redux Toolkit used for Authentication and Cart management.
+- **Forms**: React Hook Form for efficient validation and state handling.
+- **Styling**: TailwindCSS for responsive and modern UI.
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- Docker (optional)
+
+### Installation
+```bash
+npm install
 ```
+
+### Running Locally
+```bash
+npm run dev
+```
+
+### Running Tests
+- Unit Tests: `npm run test`
+- E2E Tests: `npm run test:e2e` (Requires backend running or mock)
+
+### Docker Deployment
+```bash
+# Build Image
+docker build -t smartshop-frontend .
+
+# Run Container
+docker run -p 8080:80 smartshop-frontend
+```
+
+## Implementation Details for Review
+- **Cart Logic**: See `src/store/slices/cartSlice.ts`
+- **Client Checkout**: See `src/pages/client/CheckoutPage.tsx`
+- **DevOps**: See `Dockerfile` and `nginx.conf`

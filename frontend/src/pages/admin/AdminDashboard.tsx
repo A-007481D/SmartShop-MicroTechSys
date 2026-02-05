@@ -5,8 +5,6 @@ import { Activity, DollarSign, ShoppingCart, Users, Download, Plus } from 'lucid
 import StatCard from '../../components/dashboard/StatCard';
 import { getDashboardStats, type DashboardStats } from '../../api/adminApi';
 
-// DashboardStats is imported from adminApi
-
 
 export default function AdminDashboard() {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -85,7 +83,7 @@ export default function AdminDashboard() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Orders</h2>
                     <div className="h-48 flex items-center justify-center text-gray-400 bg-gray-50 rounded-lg border-dashed border-2 border-gray-200">
-                        Chart / Table Placeholder
+                        Chart / Table
                     </div>
                 </div>
 
@@ -93,7 +91,7 @@ export default function AdminDashboard() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Top Products</h2>
                     <div className="h-48 flex items-center justify-center text-gray-400 bg-gray-50 rounded-lg border-dashed border-2 border-gray-200">
-                        Chart / list Placeholder
+                        Chart / list
                     </div>
                 </div>
             </div>
